@@ -1,12 +1,15 @@
 package com.dx.ss.plugins.ptree.generate;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.dx.ss.plugins.ptree.config.BaseConfiguration;
 import com.dx.ss.plugins.ptree.config.JDBCConnectionConfiguration;
+import com.dx.ss.plugins.ptree.config.TableConfiguration;
 import com.dx.ss.plugins.ptree.db.ConnectionFactory;
 import com.dx.ss.plugins.ptree.db.JDBCConnectionFactory;
 import com.dx.ss.plugins.ptree.generate.xml.GeneratedXmlFile;
@@ -35,6 +38,15 @@ public class Mybatis3Generator {
         Connection connection = null;
         try {
 			connection = getConnection(configuration.getJdbcConnectionConfiguration());
+			DatabaseMetaData metaData = connection.getMetaData();
+			ArrayList<TableConfiguration> tableConfigurations = configuration.getTableConfigurations();
+			for (TableConfiguration tc : tableConfigurations) {
+				ResultSet rs = metaData.getColumns(null, tc.getSchema(), tc.getTableName(), null);
+				 while (rs.next()) {
+					 String columnName = rs.getString("COLUMN_NAME");
+		             
+				 }
+			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
