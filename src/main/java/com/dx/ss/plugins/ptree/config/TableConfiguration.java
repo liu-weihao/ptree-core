@@ -40,7 +40,6 @@ public class TableConfiguration {
     /** The domain object name. */
     private String beanName;
 
-
     /**
      * To xml element.
      *
@@ -125,6 +124,14 @@ public class TableConfiguration {
 	
 	public void addIgnoredColumn(String column) {
 		ignoredColumns.add(column);
+	}
+	
+	public String getMapperName(){
+		return StringUtils.isNotBlank(beanName)?(beanName + "Mapper") : "Mapper";
+	}
+	
+	public String getRepositoryName(){
+		return StringUtils.isNotBlank(beanName)?(beanName + "Repository") : "Repository";
 	}
 	
 	@Override

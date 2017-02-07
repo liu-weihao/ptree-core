@@ -64,6 +64,15 @@ public class IntrospectedColumn {
     }
 
     @Override
+	public boolean equals(Object obj) {
+    	if(obj instanceof IntrospectedColumn){
+    		IntrospectedColumn o = (IntrospectedColumn) obj;
+    		return this.actualColumnName.equals(o.getActualColumnName());
+    	}
+    	return false;
+	}
+
+	@Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 

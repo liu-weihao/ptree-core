@@ -6,6 +6,8 @@ import com.dx.ss.plugins.ptree.config.TableConfiguration;
 
 public class IntrospectedTable {
 	
+	private String fileName;
+	
 	private TableConfiguration table;
 	
 	/** The primary key column. */
@@ -21,6 +23,14 @@ public class IntrospectedTable {
      * Table remarks retrieved from database metadata
      */
     private String remarks;
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
 
 	public TableConfiguration getTable() {
 		return table;
