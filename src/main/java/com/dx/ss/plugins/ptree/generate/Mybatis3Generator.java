@@ -7,12 +7,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.dx.ss.plugins.ptree.config.BaseConfiguration;
 import com.dx.ss.plugins.ptree.config.JDBCConnectionConfiguration;
 import com.dx.ss.plugins.ptree.config.TableConfiguration;
 import com.dx.ss.plugins.ptree.db.ConnectionFactory;
 import com.dx.ss.plugins.ptree.db.JDBCConnectionFactory;
 import com.dx.ss.plugins.ptree.generate.xml.GeneratedXmlFile;
+import com.dx.ss.plugins.ptree.internal.ObjectFactory;
+import com.dx.ss.plugins.ptree.internal.table.IntrospectedColumn;
+import com.dx.ss.plugins.ptree.internal.table.IntrospectedTable;
+import com.dx.ss.plugins.ptree.utils.ClassloaderUtility;
 
 public class Mybatis3Generator {
 
@@ -35,17 +41,41 @@ public class Mybatis3Generator {
 	public void generate(){
 //		generatedJavaFiles.clear();
         generatedXmlFiles.clear();
+        ObjectFactory.reset();
+        String classPathEntry = configuration.getClassPathEntry();
+        if(StringUtils.isNotBlank(classPathEntry)){
+        	ObjectFactory.addExternalClassLoader(ClassloaderUtility.getCustomClassloader(classPathEntry));
+        }
         Connection connection = null;
         try {
 			connection = getConnection(configuration.getJdbcConnectionConfiguration());
 			DatabaseMetaData metaData = connection.getMetaData();
 			ArrayList<TableConfiguration> tableConfigurations = configuration.getTableConfigurations();
+			List<IntrospectedTable> introspectedTables = new ArrayList<>();
 			for (TableConfiguration tc : tableConfigurations) {
+				//get all columns.
 				ResultSet rs = metaData.getColumns(null, tc.getSchema(), tc.getTableName(), null);
-				 while (rs.next()) {
-					 String columnName = rs.getString("COLUMN_NAME");
-		             
+				IntrospectedTable introspectedTable = new IntrospectedTable();
+				introspectedTable.setTable(tc);
+				List<IntrospectedColumn> baseColumns = new ArrayList<>();
+				while (rs.next()) {
+					 IntrospectedColumn column = new IntrospectedColumn();
+					 column.setActualColumnName(rs.getString("COLUMN_NAME"));
+					 column.setAutoIncrement(rs.getString("IS_AUTOINCREMENT").equals("YES"));
+					 column.setNullable(rs.getString("IS_NULLABLE").equals("YES"));
+					 column.setJdbcTypeName(rs.getString("TYPE_NAME"));
+					 column.setJdbcType(rs.getInt("DATA_TYPE"));
+					 column.setDefaultValue(rs.getString("COLUMN_DEF"));
+					 column.setRemarks(rs.getString("REMARKS"));
+					 baseColumns.add(column);
 				 }
+				 ResultSet primaryKeys = metaData.getPrimaryKeys(null, tc.getSchema(), tc.getTableName());
+				 while (primaryKeys.next()) {
+					IntrospectedColumn primaryKeyColumn = new IntrospectedColumn();
+					introspectedTable.setPrimaryKeyColumn(primaryKeyColumn );
+				 }
+				 introspectedTable.setBaseColumns(baseColumns);
+				 introspectedTables.add(introspectedTable);
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

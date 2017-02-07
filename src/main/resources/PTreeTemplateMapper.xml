@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="###">
+	<resultMap id="BaseResultMap" type="@@">
+		<id column="id" property="id" jdbcType="INTEGER" />
+		<result column="nlevel" property="nlevel" jdbcType="INTEGER" />
+		<result column="left_id" property="leftId" jdbcType="INTEGER" />
+		<result column="right_id" property="rightId" jdbcType="INTEGER" />
+	</resultMap>
+
+	<!-- 获取所有直接子类 -->
+	<select id="selectChildNodes" parameterType="@@" resultMap="BaseResultMap">
+ 		<![CDATA[
+ 			SELECT * FROM ~~ WHERE left_id>#{leftId} AND right_id<#{rightId} AND nlevel=#{level} + 1 ORDER BY left_id ASC
+ 		]]>
+	</select>
+
+	<!-- 获取所有的父类（直接和间接的，根节点除外），按照父类到子类的顺序列表返回，返回包含子类本身 -->
+	<select id="getAllParents" parameterType="@@" resultMap="BaseResultMap">
+ 		<![CDATA[
+ 			SELECT * FROM ~~ WHERE left_id<=#{leftId} AND right_id>=#{rightId} AND nlevel>0 ORDER BY left_id ASC
+ 		]]>
+	</select>
+
+	<!-- 获取直接父类 -->
+	<select id="getParentClassify" parameterType="@@" resultMap="BaseResultMap">
+ 		<![CDATA[
+ 			SELECT * FROM ~~ WHERE left_id<#{leftId} AND right_id>#{rightId} AND nlevel=#{nlevel} - 1
+ 		]]>
+	</select>
+
+	<update id="allocateLeftId" parameterType="map">
+ 		<![CDATA[
+ 			UPDATE ~~ SET left_id = left_id + 2  WHERE left_id > #{leftId}
+ 		]]>
+	</update>
+
+	<update id="allocateRightId" parameterType="map">
+ 		<![CDATA[
+ 			UPDATE ~~ SET right_id = right_id + 2  WHERE right_id > #{rightId}
+ 		]]>
+	</update>
+
+	<update id="recycleLeftId" parameterType="map">
+ 		<![CDATA[
+ 			UPDATE ~~ SET left_id=left_id - 2 WHERE left_id > #{leftId}
+ 		]]>
+	</update>
+
+	<update id="recycleRightId" parameterType="map">
+ 		<![CDATA[
+ 			UPDATE ~~ SET right_id=right_id - 2 WHERE right_id > #{rightId}
+ 		]]>
+	</update>
+
+</mapper>

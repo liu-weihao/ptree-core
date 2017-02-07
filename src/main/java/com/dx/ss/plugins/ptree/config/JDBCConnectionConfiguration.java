@@ -74,7 +74,7 @@ public class JDBCConnectionConfiguration {
         xmlElement.addAttribute(new Attribute("connectionURL", connectionURL)); //$NON-NLS-1$
 
         if (StringUtils.isBlank(user)) {
-            xmlElement.addAttribute(new Attribute("userId", user)); //$NON-NLS-1$
+            xmlElement.addAttribute(new Attribute("user", user)); //$NON-NLS-1$
         }
 
         if (StringUtils.isBlank(password)) {

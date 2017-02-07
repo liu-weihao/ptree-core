@@ -24,10 +24,11 @@ import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 
 import com.dx.ss.plugins.ptree.config.JDBCConnectionConfiguration;
+import com.dx.ss.plugins.ptree.internal.ObjectFactory;
 
 public class JDBCConnectionFactory implements ConnectionFactory {
 
-    private String userId;
+    private String user;
     private String password;
     private String connectionURL;
     private String driverClass;
@@ -39,7 +40,7 @@ public class JDBCConnectionFactory implements ConnectionFactory {
      */
     public JDBCConnectionFactory(JDBCConnectionConfiguration config) {
         super();
-        userId = config.getUser();
+        user = config.getUser();
         password = config.getPassword();
         connectionURL = config.getConnectionURL();
         driverClass = config.getDriverClass();
@@ -59,8 +60,8 @@ public class JDBCConnectionFactory implements ConnectionFactory {
 
         Properties props = new Properties();
 
-        if (StringUtils.isNotBlank(userId)) {
-            props.setProperty("user", userId);
+        if (StringUtils.isNotBlank(user)) {
+            props.setProperty("user", user);
         }
 
         if (StringUtils.isNotBlank(password)) {
@@ -79,7 +80,7 @@ public class JDBCConnectionFactory implements ConnectionFactory {
     private Driver getDriver() {
         Driver driver = null;
         try {
-            Class<?> clazz = Class.forName(driverClass);
+            Class<?> clazz = ObjectFactory.externalClassForName(driverClass);
             driver = (Driver) clazz.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
@@ -91,7 +92,7 @@ public class JDBCConnectionFactory implements ConnectionFactory {
     public void addConfigurationProperties(Properties properties) {
         // this should only be called when this connection factory is
         // specified in a ConnectionFactory configuration
-        userId = properties.getProperty("userId");
+        user = properties.getProperty("userId");
         password = properties.getProperty("password");
         connectionURL = properties.getProperty("connectionURL");
         driverClass = properties.getProperty("driverClass");
