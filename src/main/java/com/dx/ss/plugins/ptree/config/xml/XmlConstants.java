@@ -15,11 +15,14 @@
  */
 package com.dx.ss.plugins.ptree.config.xml;
 
-/**
- * @author Jeff Butler
- */
+import java.sql.Types;
+import java.util.HashMap;
+import java.util.Map;
+
 public class XmlConstants {
 
+	public static Map<Integer, String> typeMap;
+	
     /**
      * Utility Class, no instances
      */
@@ -50,4 +53,42 @@ public class XmlConstants {
     public static final String MYBATIS_GENERATOR_CONFIG_SYSTEM_ID = "http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd"; //$NON-NLS-1$
 
     public static final String MYBATIS_GENERATOR_CONFIG_PUBLIC_ID = "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"; //$NON-NLS-1$
+    
+    static {
+    	typeMap = new HashMap<Integer, String>();
+        typeMap.put(Types.ARRAY, "ARRAY");
+        typeMap.put(Types.BIGINT, "BIGINT");
+        typeMap.put(Types.BINARY, "BINARY");
+        typeMap.put(Types.BIT, "BIT");
+        typeMap.put(Types.BLOB, "BLOB");
+        typeMap.put(Types.BOOLEAN, "BOOLEAN");
+        typeMap.put(Types.CHAR, "CHAR");
+        typeMap.put(Types.CLOB, "CLOB");
+        typeMap.put(Types.DATALINK, "DATALINK");
+        typeMap.put(Types.DATE, "DATE");
+        typeMap.put(Types.DECIMAL, "DECIMAL");
+        typeMap.put(Types.DISTINCT, "DISTINCT");
+        typeMap.put(Types.DOUBLE, "DOUBLE");
+        typeMap.put(Types.FLOAT, "FLOAT");
+        typeMap.put(Types.INTEGER, "INTEGER");
+        typeMap.put(Types.JAVA_OBJECT, "JAVA_OBJECT");
+        typeMap.put(Types.LONGNVARCHAR, "LONGNVARCHAR");
+        typeMap.put(Types.LONGVARBINARY, "LONGVARBINARY"); //$NON-NLS-1$
+        typeMap.put(Types.LONGVARCHAR, "LONGVARCHAR");
+        typeMap.put(Types.NCHAR, "NCHAR");
+        typeMap.put(Types.NCLOB, "NCLOB");
+        typeMap.put(Types.NVARCHAR, "NVARCHAR");
+        typeMap.put(Types.NULL, "NULL");
+        typeMap.put(Types.NUMERIC, "NUMERIC");
+        typeMap.put(Types.OTHER, "OTHER");
+        typeMap.put(Types.REAL, "REAL");
+        typeMap.put(Types.REF, "REF");
+        typeMap.put(Types.SMALLINT, "SMALLINT");
+        typeMap.put(Types.STRUCT, "STRUCT");
+        typeMap.put(Types.TIME, "TIME");
+        typeMap.put(Types.TIMESTAMP, "TIMESTAMP");
+        typeMap.put(Types.TINYINT, "TINYINT");
+        typeMap.put(Types.VARBINARY, "VARBINARY"); //$NON-NLS-1$
+        typeMap.put(Types.VARCHAR, "VARCHAR");
+    }
 }

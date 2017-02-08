@@ -19,6 +19,8 @@ public class IntrospectedTable {
     /** The blob columns. */
     private List<IntrospectedColumn> blobColumns;
     
+    private String fullQualifiedJavaType; 
+    
     /**
      * Table remarks retrieved from database metadata
      */
@@ -62,6 +64,14 @@ public class IntrospectedTable {
 
 	public void setBlobColumns(List<IntrospectedColumn> blobColumns) {
 		this.blobColumns = blobColumns;
+	}
+
+	public String getFullQualifiedJavaType() {
+		return fullQualifiedJavaType;
+	}
+
+	public void setFullQualifiedJavaType(String fullQualifiedJavaType) {
+		this.fullQualifiedJavaType = fullQualifiedJavaType;
 	}
 
 	public String getRemarks() {

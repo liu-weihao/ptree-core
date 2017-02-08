@@ -62,31 +62,18 @@ public class GeneratedXmlFile extends GeneratedFile {
         this.xmlFormatter = xmlFormatter;
     }
 
-    /* (non-Javadoc)
-     * @see org.mybatis.generator.api.GeneratedFile#getFormattedContent()
-     */
-    @Override
-    public String getFormattedContent() {
-        return xmlFormatter.getFormattedContent(document);
-    }
-
-    /**
-     * Gets the file name.
-     *
-     * @return Returns the fileName.
-     */
     @Override
     public String getFileName() {
         return fileName;
     }
 
-    /**
-     * Gets the target package.
-     *
-     * @return Returns the targetPackage.
-     */
     @Override
     public String getTargetPackage() {
         return targetPackage;
+    }
+
+    @Override
+    public String getFormattedContent() {
+        return xmlFormatter.getFormattedContent(document);
     }
 }
