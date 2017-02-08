@@ -1,5 +1,7 @@
 package com.dx.ss.plugins.ptree.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class ColumnPropertyUtil {
 
 	public static String getPropertyFromColumn(String column) {
@@ -49,4 +51,15 @@ public class ColumnPropertyUtil {
         } 
         return column.toString(); 
     }
+	
+	public static String lowerFirstLetter(String str){
+		if(StringUtils.isBlank(str))	return StringUtils.EMPTY;
+		char firstLetter = str.charAt(0);
+		if (firstLetter >= 'A' && firstLetter <= 'Z') {
+			String temp = new String(new char[]{firstLetter});
+			return str.replaceFirst(temp, temp.toLowerCase());
+		}
+		return str;
+	}
+	
 }
