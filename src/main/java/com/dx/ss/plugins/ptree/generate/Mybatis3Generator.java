@@ -28,6 +28,12 @@ import com.dx.ss.plugins.ptree.config.xml.XmlConstants;
 import com.dx.ss.plugins.ptree.config.xml.XmlElement;
 import com.dx.ss.plugins.ptree.db.ConnectionFactory;
 import com.dx.ss.plugins.ptree.db.JDBCConnectionFactory;
+import com.dx.ss.plugins.ptree.generate.java.FullyQualifiedJavaType;
+import com.dx.ss.plugins.ptree.generate.java.GeneratedJavaFile;
+import com.dx.ss.plugins.ptree.generate.java.JavaAttribute;
+import com.dx.ss.plugins.ptree.generate.java.JavaVisibility;
+import com.dx.ss.plugins.ptree.generate.java.Method;
+import com.dx.ss.plugins.ptree.generate.java.Parameter;
 import com.dx.ss.plugins.ptree.generate.xml.GeneratedXmlFile;
 import com.dx.ss.plugins.ptree.impl.DefaultShellCallback;
 import com.dx.ss.plugins.ptree.internal.ObjectFactory;
@@ -45,7 +51,7 @@ public class Mybatis3Generator {
     private BaseConfiguration configuration;
     
     /** The generated java files. */
-//    private List<GeneratedJavaFile> generatedJavaFiles;
+    private List<GeneratedJavaFile> generatedJavaFiles;
 
     /** The generated xml files. */
     private List<GeneratedXmlFile> generatedXmlFiles;
@@ -58,12 +64,12 @@ public class Mybatis3Generator {
 			this.shellCallback = new DefaultShellCallback();
 		}
 		this.configuration = configuration;
-//		generatedJavaFiles = new ArrayList<GeneratedJavaFile>();
+		generatedJavaFiles = new ArrayList<GeneratedJavaFile>();
         generatedXmlFiles = new ArrayList<GeneratedXmlFile>();
 	}
     
 	public void generate(){
-//		generatedJavaFiles.clear();
+		generatedJavaFiles.clear();
         generatedXmlFiles.clear();
         ObjectFactory.reset();
         String classPathEntry = configuration.getClassPathEntry();
@@ -137,11 +143,104 @@ public class Mybatis3Generator {
 
 	private void generateJavaFiles(List<IntrospectedTable> introspectTables) {
 		// TODO Auto-generated method stub
+		for(IntrospectedTable it:introspectTables){
+			GeneratedJavaFile mapperFile = generateMapper(it);
+			generatedJavaFiles.add(mapperFile);
+			GeneratedJavaFile beanFile = generateBean(it);
+			generatedJavaFiles.add(beanFile);
+		}
 		
 	}
 	
-	private void generateXmlFiles(List<IntrospectedTable> introspectTables) {
+	private GeneratedJavaFile generateBean(IntrospectedTable introspectedTable) {
 		// TODO Auto-generated method stub
+		Mybatis3Configuration mybatisConfig = (Mybatis3Configuration) configuration;
+		PackageConfiguration packageConfig = mybatisConfig.getPackageConfiguration();
+		TableConfiguration table = introspectedTable.getTable();
+		StringBuilder importBuilder = new StringBuilder();
+		importBuilder.append("import ");
+		importBuilder.append(List.class.getName());
+		importBuilder.append("import ");
+		importBuilder.append(introspectedTable.getFullQualifiedJavaType());
+		GeneratedJavaFile javaFile = new GeneratedJavaFile();
+		javaFile.setPackageName(packageConfig.getBasePackage() + packageConfig.getBeanSubPackage());
+		javaFile.setInterface(false);
+		javaFile.setClassName(table.getBeanName());
+		List<JavaAttribute> javaAttributes = new ArrayList<>();
+		IntrospectedColumn primaryKeyColumn = introspectedTable.getPrimaryKeyColumn();
+		JavaAttribute primaryAttr = new JavaAttribute();
+		primaryAttr.setAttributeName(ColumnPropertyUtil.getPropertyFromColumn(primaryKeyColumn.getActualColumnName()));
+//		primaryAttr.setType(new FullyQualifiedJavaType(packageName, simpleName, primitive));
+		List<IntrospectedColumn> baseColumns = introspectedTable.getBaseColumns();
+		
+		javaFile.setJavaAttributes(javaAttributes );
+		return null;
+	}
+
+	private GeneratedJavaFile generateMapper(IntrospectedTable introspectedTable) {
+		// TODO Auto-generated method stub
+		Mybatis3Configuration mybatisConfig = (Mybatis3Configuration) configuration;
+		XmlMapper packageConfig = mybatisConfig.getXmlMapper();
+		TableConfiguration table = introspectedTable.getTable();
+		StringBuilder importBuilder = new StringBuilder();
+		importBuilder.append("import ");
+		importBuilder.append(List.class.getName());
+		importBuilder.append("import ");
+		importBuilder.append(introspectedTable.getFullQualifiedJavaType());
+		GeneratedJavaFile javaFile = new GeneratedJavaFile();
+		javaFile.setPackageName(packageConfig.getModel());
+		javaFile.setInterface(true);
+		javaFile.setImports(importBuilder.toString());
+		javaFile.setVisibility(JavaVisibility.PUBLIC);
+		javaFile.setClassName(introspectedTable.getFileName());
+		List<Method> methods = new ArrayList<>();
+		Method selectChildNodes = new Method("selectChildNodes");
+		selectChildNodes.setVisibility(JavaVisibility.PUBLIC);
+		selectChildNodes.setReturnType(new FullyQualifiedJavaType(List.class.getName(), "List<"+table.getBeanName()+">", false));
+		selectChildNodes.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getFullQualifiedJavaType(), table.getBeanName(), false)));
+		methods.add(selectChildNodes);
+		
+		Method getAllParents = new Method("getAllParents");
+		getAllParents.setVisibility(JavaVisibility.PUBLIC);
+		getAllParents.setReturnType(new FullyQualifiedJavaType(List.class.getName(), "List<"+table.getBeanName()+">", false));
+		getAllParents.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getFullQualifiedJavaType(), table.getBeanName(), false)));
+		methods.add(getAllParents);
+		
+		Method getParentClassify = new Method("getParentClassify");
+		getParentClassify.setVisibility(JavaVisibility.PUBLIC);
+		getParentClassify.setReturnType(new FullyQualifiedJavaType(introspectedTable.getFullQualifiedJavaType(), table.getBeanName(), false));
+		getParentClassify.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getFullQualifiedJavaType(), table.getBeanName(), false)));
+		methods.add(getParentClassify);
+		
+		Method allocateLeftId = new Method("allocateLeftId");
+		allocateLeftId.setVisibility(JavaVisibility.PUBLIC);
+		allocateLeftId.setReturnType(new FullyQualifiedJavaType(Integer.class.getName(), "int", true));
+		allocateLeftId.addParameter(new Parameter(new FullyQualifiedJavaType(Integer.class.getName(), "leftId", true)));
+		methods.add(allocateLeftId);
+		
+		Method allocateRightId = new Method("allocateLeftId");
+		allocateRightId.setVisibility(JavaVisibility.PUBLIC);
+		allocateRightId.setReturnType(new FullyQualifiedJavaType(Integer.class.getName(), "int", true));
+		allocateRightId.addParameter(new Parameter(new FullyQualifiedJavaType(Integer.class.getName(), "rightId", true)));
+		methods.add(allocateRightId);
+		
+		Method recycleLeftId = new Method("recycleLeftId");
+		recycleLeftId.setVisibility(JavaVisibility.PUBLIC);
+		recycleLeftId.setReturnType(new FullyQualifiedJavaType(Integer.class.getName(), "int", true));
+		recycleLeftId.addParameter(new Parameter(new FullyQualifiedJavaType(Integer.class.getName(), "leftId", true)));
+		methods.add(recycleLeftId);
+
+		Method recycleRightId = new Method("recycleRightId");
+		recycleRightId.setVisibility(JavaVisibility.PUBLIC);
+		recycleRightId.setReturnType(new FullyQualifiedJavaType(Integer.class.getName(), "int", true));
+		recycleRightId.addParameter(new Parameter(new FullyQualifiedJavaType(Integer.class.getName(), "rightId", true)));
+		methods.add(recycleRightId);
+		
+		javaFile.setMethods(methods);
+		return javaFile;
+	}
+
+	private void generateXmlFiles(List<IntrospectedTable> introspectTables) {
 		Mybatis3Configuration mybatisConfig = (Mybatis3Configuration) configuration;
 		for(IntrospectedTable it:introspectTables){
 			Document document = new Document(

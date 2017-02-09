@@ -4,7 +4,7 @@ public class JavaAttribute {
 
 	private JavaVisibility visibility = JavaVisibility.PRIVATE;
 	
-	private Class<?> type;
+	private FullyQualifiedJavaType type;
 	
 	private String attributeName;
 
@@ -16,11 +16,11 @@ public class JavaAttribute {
 		this.visibility = visibility;
 	}
 
-	public Class<?> getType() {
+	public FullyQualifiedJavaType getType() {
 		return type;
 	}
 
-	public void setType(Class<?> type) {
+	public void setType(FullyQualifiedJavaType type) {
 		this.type = type;
 	}
 
