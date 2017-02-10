@@ -4,11 +4,11 @@ public class PackageConfiguration {
 
 	private String basePackage;
 	
-	private String beanSubPackage;
+	private String beanSubPackage = "bean";
 	
-	private String serviceSubPackage;
+	private String serviceSubPackage = "service";
 	
-	private String daoSubPackage;
+	private String daoSubPackage = "dao";
 
 	public String getBasePackage() {
 		return basePackage;

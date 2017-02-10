@@ -152,6 +152,10 @@ public class Mybatis3Generator {
 			generatedJavaFiles.add(mapperFile);
 			GeneratedJavaFile beanFile = generateBean(it);
 			generatedJavaFiles.add(beanFile);
+			GeneratedJavaFile daoFile = generateDao(it);
+			generatedJavaFiles.add(daoFile);
+			GeneratedJavaFile serviceFile = generateService(it);
+			generatedJavaFiles.add(serviceFile);
 		}
 	}
 
@@ -165,18 +169,20 @@ public class Mybatis3Generator {
 		String beanPackage = packageConfig.getBasePackage() + "." + packageConfig.getBeanSubPackage();
 		String targetPackage = packageConfig.getBasePackage() + "." +  packageConfig.getBeanSubPackage();
 		GeneratedJavaFile javaFile = new GeneratedJavaFile("src/main/java", targetPackage, table.getBeanName());
+		boolean enableComments = introspectedTable.getTable().isEnableComments();
+		javaFile.setNeedComments(enableComments);
 		javaFile.setPackageName(beanPackage);
 		javaFile.setInterface(false);
 		javaFile.setClassName(table.getBeanName());
 		List<IntrospectedColumn> allColumns = introspectedTable.getAllColumns();
 		List<JavaAttribute> javaAttributes = new ArrayList<>();
 		for(IntrospectedColumn column:allColumns){
-			JavaAttribute primaryAttr = new JavaAttribute();
+			JavaAttribute javaAttribute = new JavaAttribute();
 			FullyQualifiedJavaType javaProperty = column.getJavaProperty();
-			primaryAttr.setType(javaProperty);
+			javaAttribute.setType(javaProperty);
 			String propertyName = ColumnPropertyUtil.getPropertyFromColumn(column.getActualColumnName());
-			primaryAttr.setAttributeName(propertyName);
-			javaAttributes.add(primaryAttr);
+			javaAttribute.setAttributeName(propertyName);
+			javaAttributes.add(javaAttribute);
 			Method getterMethod = new Method("get" + ColumnPropertyUtil.upperFirstLetter(propertyName));
 			getterMethod.setReturnType(javaProperty);
 			getterMethod.addBodyLine("return this."+propertyName+";");
@@ -185,6 +191,9 @@ public class Mybatis3Generator {
 			setterMethod.addParameter(new Parameter(javaProperty, propertyName));
 			setterMethod.addBodyLine("this."+propertyName+" = "+propertyName+";");
 			javaFile.addMethod(setterMethod);
+			if(enableComments){
+				javaAttribute.setComments(column.getRemarks());
+			}
 		}
 		javaFile.setJavaAttributes(javaAttributes);
 		return javaFile;
@@ -258,6 +267,36 @@ public class Mybatis3Generator {
 		return javaFile;
 	}
 
+
+	private GeneratedJavaFile generateService(IntrospectedTable introspectedTable) {
+		// TODO Auto-generated method stub
+		Mybatis3Configuration mybatisConfig = (Mybatis3Configuration) configuration;
+		PackageConfiguration packageConfig = mybatisConfig.getPackageConfiguration();
+		TableConfiguration table = introspectedTable.getTable();
+		StringBuilder importBuilder = new StringBuilder();
+		importBuilder.append("import ");
+		importBuilder.append(List.class.getName());
+		importBuilder.append(";");
+		OutputUtil.newLine(importBuilder);
+		
+		importBuilder.append("import ");
+		importBuilder.append(introspectedTable.getFullQualifiedJavaType());
+		importBuilder.append(";");
+		OutputUtil.newLine(importBuilder);
+
+		String targetPackage = packageConfig.getBasePackage() + "." + packageConfig.getServiceSubPackage();
+		GeneratedJavaFile javaFile = new GeneratedJavaFile("src/main/java", targetPackage, introspectedTable.getFileName());
+		javaFile.setPackageName(targetPackage);
+		
+		return javaFile;
+	}
+	
+
+	private GeneratedJavaFile generateDao(IntrospectedTable introspectedTable) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	private void writeJavaFiles() {
 		// TODO Auto-generated method stub
 		if(generatedJavaFiles.size() == 0)	return;

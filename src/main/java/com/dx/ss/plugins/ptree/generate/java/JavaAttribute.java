@@ -7,6 +7,8 @@ public class JavaAttribute {
 	private FullyQualifiedJavaType type;
 	
 	private String attributeName;
+	
+	private String comments;
 
 	public JavaVisibility getVisibility() {
 		return visibility;
@@ -30,6 +32,14 @@ public class JavaAttribute {
 
 	public void setAttributeName(String attributeName) {
 		this.attributeName = attributeName;
+	}
+
+	public String getComments() {
+		return comments;
+	}
+
+	public void setComments(String comments) {
+		this.comments = comments;
 	}
 	
 }

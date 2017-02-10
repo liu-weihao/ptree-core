@@ -29,6 +29,8 @@ public class GeneratedJavaFile extends GeneratedFile {
 	private List<JavaAttribute> javaAttributes = null;
 	
 	private List<Method> methods = null;
+	
+	private boolean needComments;
 
 	public GeneratedJavaFile(String targetProject, String targetPackage, String fileName) {
 		super(targetProject);
@@ -94,6 +96,14 @@ public class GeneratedJavaFile extends GeneratedFile {
 		if(method != null)		this.methods.add(method);
 	}
 	
+	public boolean isNeedComments() {
+		return needComments;
+	}
+
+	public void setNeedComments(boolean needComments) {
+		this.needComments = needComments;
+	}
+
 	public String getFormattedContent(){
 		StringBuilder content = new StringBuilder();
 		content.append("package ");
@@ -112,6 +122,13 @@ public class GeneratedJavaFile extends GeneratedFile {
 		if(javaAttributes != null){
 			for(JavaAttribute attr : javaAttributes){
 				OutputUtil.newLine(content);
+				if(needComments && StringUtils.isNoneBlank(attr.getComments())){
+					OutputUtil.javaIndent(content, 1);
+					content.append("/**");
+					content.append(attr.getComments());
+					content.append("*/");
+					OutputUtil.newLine(content);
+				}
 				OutputUtil.javaIndent(content, 1);
 				content.append(attr.getVisibility().getValue());
 				content.append(attr.getType().getSimpleName());
