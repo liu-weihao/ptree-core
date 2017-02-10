@@ -1,5 +1,6 @@
 package com.dx.ss.plugins.ptree.internal.table;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.dx.ss.plugins.ptree.config.TableConfiguration;
@@ -25,6 +26,12 @@ public class IntrospectedTable {
      * Table remarks retrieved from database metadata
      */
     private String remarks;
+
+	public IntrospectedTable() {
+		super();
+		baseColumns = new ArrayList<>();
+		blobColumns = new ArrayList<>();
+	}
 
 	public String getFileName() {
 		return fileName;
@@ -82,4 +89,11 @@ public class IntrospectedTable {
 		this.remarks = remarks;
 	}
 	
+	public List<IntrospectedColumn> getAllColumns(){
+		List<IntrospectedColumn> allColumns = new ArrayList<>();
+		if(primaryKeyColumn != null) allColumns.add(0, primaryKeyColumn);
+		allColumns.addAll(baseColumns);
+		allColumns.addAll(blobColumns);
+		return allColumns;
+	}
 }

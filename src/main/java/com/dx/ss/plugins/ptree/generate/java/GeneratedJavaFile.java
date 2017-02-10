@@ -1,13 +1,21 @@
 package com.dx.ss.plugins.ptree.generate.java;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.dx.ss.plugins.ptree.generate.GeneratedFile;
 import com.dx.ss.plugins.ptree.utils.OutputUtil;
 
-public class GeneratedJavaFile {
+public class GeneratedJavaFile extends GeneratedFile {
 
+	/** The file name. */
+    private String fileName;
+    
+    /** The target package. */
+    private String targetPackage;
+    
 	private String packageName;
 	
 	private String imports;
@@ -18,10 +26,18 @@ public class GeneratedJavaFile {
 	
 	private String className;
 	
-	private List<JavaAttribute> javaAttributes;
+	private List<JavaAttribute> javaAttributes = null;
 	
-	private List<Method> methods;
+	private List<Method> methods = null;
 
+	public GeneratedJavaFile(String targetProject, String targetPackage, String fileName) {
+		super(targetProject);
+		this.targetPackage = targetPackage;
+		this.fileName = fileName;
+		methods = new ArrayList<>();
+		javaAttributes = new ArrayList<>();
+	}
+	
 	public String getPackageName() {
 		return packageName;
 	}
@@ -74,8 +90,8 @@ public class GeneratedJavaFile {
 		return methods;
 	}
 
-	public void setMethods(List<Method> methods) {
-		this.methods = methods;
+	public void addMethod(Method method) {
+		if(method != null)		this.methods.add(method);
 	}
 	
 	public String getFormattedContent(){
@@ -110,6 +126,16 @@ public class GeneratedJavaFile {
 			}
 		}
 		content.append("} ");
-		return StringUtils.EMPTY;
+		return content.toString();
+	}
+
+	@Override
+	public String getFileName() {
+		return this.fileName;
+	}
+
+	@Override
+	public String getTargetPackage() {
+		return this.targetPackage;
 	}
 }

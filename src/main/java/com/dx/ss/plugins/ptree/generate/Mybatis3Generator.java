@@ -82,6 +82,7 @@ public class Mybatis3Generator {
 			DatabaseMetaData metaData = connection.getMetaData();
 			List<IntrospectedTable> introspectTables = introspectTables(metaData);
 			generateJavaFiles(introspectTables);
+			writeJavaFiles();
 			generateXmlFiles(introspectTables);
 			writeXmlFiles();
 		} catch (SQLException e) {
@@ -124,8 +125,9 @@ public class Mybatis3Generator {
 				column.setActualColumnName(columnName);
 				column.setAutoIncrement(isAutoIncrement);
 				column.setNullable(nullable);
-				column.setJdbcTypeName(XmlConstants.typeMap.get(jdbcType));
 				column.setJdbcType(jdbcType);
+				column.setJdbcTypeName(XmlConstants.typeMap.get(jdbcType)[0].toString());
+				column.setJavaProperty((FullyQualifiedJavaType) XmlConstants.typeMap.get(jdbcType)[1]);
 				column.setDefaultValue(defaultValue);
 				column.setRemarks(remarks);
 				if(columnName.equals(primaryKey)){//primary key
@@ -149,9 +151,8 @@ public class Mybatis3Generator {
 			GeneratedJavaFile beanFile = generateBean(it);
 			generatedJavaFiles.add(beanFile);
 		}
-		
 	}
-	
+
 	private GeneratedJavaFile generateBean(IntrospectedTable introspectedTable) {
 		// TODO Auto-generated method stub
 		Mybatis3Configuration mybatisConfig = (Mybatis3Configuration) configuration;
@@ -162,19 +163,31 @@ public class Mybatis3Generator {
 		importBuilder.append(List.class.getName());
 		importBuilder.append("import ");
 		importBuilder.append(introspectedTable.getFullQualifiedJavaType());
-		GeneratedJavaFile javaFile = new GeneratedJavaFile();
-		javaFile.setPackageName(packageConfig.getBasePackage() + packageConfig.getBeanSubPackage());
+		String beanPackage = packageConfig.getBasePackage() + "." + packageConfig.getBeanSubPackage();
+		String targetPackage = packageConfig.getBasePackage() + "." +  packageConfig.getBeanSubPackage();
+		GeneratedJavaFile javaFile = new GeneratedJavaFile("src/main/java", targetPackage, introspectedTable.getFileName());
+		javaFile.setPackageName(beanPackage);
 		javaFile.setInterface(false);
 		javaFile.setClassName(table.getBeanName());
+		List<IntrospectedColumn> allColumns = introspectedTable.getAllColumns();
 		List<JavaAttribute> javaAttributes = new ArrayList<>();
-		IntrospectedColumn primaryKeyColumn = introspectedTable.getPrimaryKeyColumn();
-		JavaAttribute primaryAttr = new JavaAttribute();
-		primaryAttr.setAttributeName(ColumnPropertyUtil.getPropertyFromColumn(primaryKeyColumn.getActualColumnName()));
-//		primaryAttr.setType(new FullyQualifiedJavaType(packageName, simpleName, primitive));
-		List<IntrospectedColumn> baseColumns = introspectedTable.getBaseColumns();
-		
-		javaFile.setJavaAttributes(javaAttributes );
-		return null;
+		for(IntrospectedColumn column:allColumns){
+			JavaAttribute primaryAttr = new JavaAttribute();
+			FullyQualifiedJavaType javaProperty = column.getJavaProperty();
+			primaryAttr.setType(javaProperty);
+			String propertyName = ColumnPropertyUtil.getPropertyFromColumn(column.getActualColumnName());
+			primaryAttr.setAttributeName(propertyName);
+			javaAttributes.add(primaryAttr);
+			Method getterMethod = new Method("get" + ColumnPropertyUtil.upperFirstLetter(propertyName));
+			getterMethod.setReturnType(javaProperty);
+			getterMethod.addParameter(new Parameter(javaProperty));
+			getterMethod.addBodyLine("return this."+propertyName);
+			javaFile.addMethod(getterMethod);
+			Method setterMethod = new Method("set" + ColumnPropertyUtil.upperFirstLetter(propertyName));
+			setterMethod.addBodyLine("this."+propertyName+"="+propertyName);
+		}
+		javaFile.setJavaAttributes(javaAttributes);
+		return javaFile;
 	}
 
 	private GeneratedJavaFile generateMapper(IntrospectedTable introspectedTable) {
@@ -185,61 +198,87 @@ public class Mybatis3Generator {
 		StringBuilder importBuilder = new StringBuilder();
 		importBuilder.append("import ");
 		importBuilder.append(List.class.getName());
+		importBuilder.append(";");
 		importBuilder.append("import ");
 		importBuilder.append(introspectedTable.getFullQualifiedJavaType());
-		GeneratedJavaFile javaFile = new GeneratedJavaFile();
+		importBuilder.append(";");
+		String targetPackage = packageConfig.getModel();
+		GeneratedJavaFile javaFile = new GeneratedJavaFile("src/main/java", targetPackage, introspectedTable.getFileName());
 		javaFile.setPackageName(packageConfig.getModel());
 		javaFile.setInterface(true);
 		javaFile.setImports(importBuilder.toString());
 		javaFile.setVisibility(JavaVisibility.PUBLIC);
 		javaFile.setClassName(introspectedTable.getFileName());
-		List<Method> methods = new ArrayList<>();
 		Method selectChildNodes = new Method("selectChildNodes");
 		selectChildNodes.setVisibility(JavaVisibility.PUBLIC);
 		selectChildNodes.setReturnType(new FullyQualifiedJavaType(List.class.getName(), "List<"+table.getBeanName()+">", false));
 		selectChildNodes.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getFullQualifiedJavaType(), table.getBeanName(), false)));
-		methods.add(selectChildNodes);
+		javaFile.addMethod(selectChildNodes);
 		
 		Method getAllParents = new Method("getAllParents");
 		getAllParents.setVisibility(JavaVisibility.PUBLIC);
 		getAllParents.setReturnType(new FullyQualifiedJavaType(List.class.getName(), "List<"+table.getBeanName()+">", false));
 		getAllParents.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getFullQualifiedJavaType(), table.getBeanName(), false)));
-		methods.add(getAllParents);
+		javaFile.addMethod(getAllParents);
 		
 		Method getParentClassify = new Method("getParentClassify");
 		getParentClassify.setVisibility(JavaVisibility.PUBLIC);
 		getParentClassify.setReturnType(new FullyQualifiedJavaType(introspectedTable.getFullQualifiedJavaType(), table.getBeanName(), false));
 		getParentClassify.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getFullQualifiedJavaType(), table.getBeanName(), false)));
-		methods.add(getParentClassify);
+		javaFile.addMethod(getParentClassify);
 		
 		Method allocateLeftId = new Method("allocateLeftId");
 		allocateLeftId.setVisibility(JavaVisibility.PUBLIC);
 		allocateLeftId.setReturnType(new FullyQualifiedJavaType(Integer.class.getName(), "int", true));
 		allocateLeftId.addParameter(new Parameter(new FullyQualifiedJavaType(Integer.class.getName(), "leftId", true)));
-		methods.add(allocateLeftId);
+		javaFile.addMethod(allocateLeftId);
 		
 		Method allocateRightId = new Method("allocateLeftId");
 		allocateRightId.setVisibility(JavaVisibility.PUBLIC);
 		allocateRightId.setReturnType(new FullyQualifiedJavaType(Integer.class.getName(), "int", true));
 		allocateRightId.addParameter(new Parameter(new FullyQualifiedJavaType(Integer.class.getName(), "rightId", true)));
-		methods.add(allocateRightId);
+		javaFile.addMethod(allocateRightId);
 		
 		Method recycleLeftId = new Method("recycleLeftId");
 		recycleLeftId.setVisibility(JavaVisibility.PUBLIC);
 		recycleLeftId.setReturnType(new FullyQualifiedJavaType(Integer.class.getName(), "int", true));
 		recycleLeftId.addParameter(new Parameter(new FullyQualifiedJavaType(Integer.class.getName(), "leftId", true)));
-		methods.add(recycleLeftId);
+		javaFile.addMethod(recycleLeftId);
 
 		Method recycleRightId = new Method("recycleRightId");
 		recycleRightId.setVisibility(JavaVisibility.PUBLIC);
 		recycleRightId.setReturnType(new FullyQualifiedJavaType(Integer.class.getName(), "int", true));
 		recycleRightId.addParameter(new Parameter(new FullyQualifiedJavaType(Integer.class.getName(), "rightId", true)));
-		methods.add(recycleRightId);
+		javaFile.addMethod(recycleRightId);
 		
-		javaFile.setMethods(methods);
 		return javaFile;
 	}
 
+	private void writeJavaFiles() {
+		// TODO Auto-generated method stub
+		if(generatedJavaFiles.size() == 0)	return;
+		for(GeneratedJavaFile javaFile:generatedJavaFiles){
+			BufferedWriter bw = null;
+			try {
+				String javaSource = javaFile.getFormattedContent();
+				String directory = shellCallback.getDirectory(javaFile.getTargetProject(), javaFile.getTargetPackage()).getAbsolutePath();
+				String filePath =  directory + File.separatorChar + javaFile.getFileName() + ".java";
+				FileOutputStream fos = new FileOutputStream(new File(filePath), false);
+				OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+				bw = new BufferedWriter(osw);
+				bw.write(javaSource);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}finally{
+				try {
+					if(bw != null)	bw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+	
 	private void generateXmlFiles(List<IntrospectedTable> introspectTables) {
 		Mybatis3Configuration mybatisConfig = (Mybatis3Configuration) configuration;
 		for(IntrospectedTable it:introspectTables){

@@ -17,6 +17,8 @@ package com.dx.ss.plugins.ptree.internal.table;
 
 import java.sql.Types;
 
+import com.dx.ss.plugins.ptree.generate.java.FullyQualifiedJavaType;
+
 /**
  * This class holds information about an introspected column. The class has
  * utility methods useful for generating iBATIS objects.
@@ -25,23 +27,25 @@ import java.sql.Types;
  */
 public class IntrospectedColumn {
 	
-    protected String actualColumnName;
+	private String actualColumnName;
 
-    protected int jdbcType;
+    private int jdbcType;
 
-    protected String jdbcTypeName;
+    private String jdbcTypeName;
 
-    protected boolean nullable;
+    private boolean nullable;
 
     // any database comment associated with this column. May be null
-    protected String remarks;
+    private String remarks;
 
-    protected String defaultValue;
+    private String defaultValue;
+    
+    private FullyQualifiedJavaType javaProperty;
     
     /**
      * true if the JDBC driver reports that this column is auto-increment
      */
-    protected boolean isAutoIncrement;
+    private boolean isAutoIncrement;
     
     public IntrospectedColumn() {
         super();
@@ -142,7 +146,15 @@ public class IntrospectedColumn {
         this.defaultValue = defaultValue;
     }
 
-    public boolean isAutoIncrement() {
+    public FullyQualifiedJavaType getJavaProperty() {
+		return javaProperty;
+	}
+
+	public void setJavaProperty(FullyQualifiedJavaType javaProperty) {
+		this.javaProperty = javaProperty;
+	}
+
+	public boolean isAutoIncrement() {
         return isAutoIncrement;
     }
 

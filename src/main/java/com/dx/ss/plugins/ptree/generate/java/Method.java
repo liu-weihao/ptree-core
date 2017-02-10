@@ -24,7 +24,7 @@ import com.dx.ss.plugins.ptree.config.xml.OutputUtilities;
 
 public class Method {
 
-	private JavaVisibility visibility;
+	private JavaVisibility visibility = JavaVisibility.PUBLIC;
 	
     /** The body lines. */
     private List<String> bodyLines;

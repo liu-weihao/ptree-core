@@ -15,13 +15,18 @@
  */
 package com.dx.ss.plugins.ptree.config.xml;
 
+import java.awt.List;
+import java.math.BigDecimal;
 import java.sql.Types;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.dx.ss.plugins.ptree.generate.java.FullyQualifiedJavaType;
+
 public class XmlConstants {
 
-	public static Map<Integer, String> typeMap;
+	public static Map<Integer, Object[]> typeMap;
 	
     /**
      * Utility Class, no instances
@@ -55,40 +60,40 @@ public class XmlConstants {
     public static final String MYBATIS_GENERATOR_CONFIG_PUBLIC_ID = "-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"; //$NON-NLS-1$
     
     static {
-    	typeMap = new HashMap<Integer, String>();
-        typeMap.put(Types.ARRAY, "ARRAY");
-        typeMap.put(Types.BIGINT, "BIGINT");
-        typeMap.put(Types.BINARY, "BINARY");
-        typeMap.put(Types.BIT, "BIT");
-        typeMap.put(Types.BLOB, "BLOB");
-        typeMap.put(Types.BOOLEAN, "BOOLEAN");
-        typeMap.put(Types.CHAR, "CHAR");
-        typeMap.put(Types.CLOB, "CLOB");
-        typeMap.put(Types.DATALINK, "DATALINK");
-        typeMap.put(Types.DATE, "DATE");
-        typeMap.put(Types.DECIMAL, "DECIMAL");
-        typeMap.put(Types.DISTINCT, "DISTINCT");
-        typeMap.put(Types.DOUBLE, "DOUBLE");
-        typeMap.put(Types.FLOAT, "FLOAT");
-        typeMap.put(Types.INTEGER, "INTEGER");
-        typeMap.put(Types.JAVA_OBJECT, "JAVA_OBJECT");
-        typeMap.put(Types.LONGNVARCHAR, "LONGNVARCHAR");
-        typeMap.put(Types.LONGVARBINARY, "LONGVARBINARY"); //$NON-NLS-1$
-        typeMap.put(Types.LONGVARCHAR, "LONGVARCHAR");
-        typeMap.put(Types.NCHAR, "NCHAR");
-        typeMap.put(Types.NCLOB, "NCLOB");
-        typeMap.put(Types.NVARCHAR, "NVARCHAR");
-        typeMap.put(Types.NULL, "NULL");
-        typeMap.put(Types.NUMERIC, "NUMERIC");
-        typeMap.put(Types.OTHER, "OTHER");
-        typeMap.put(Types.REAL, "REAL");
-        typeMap.put(Types.REF, "REF");
-        typeMap.put(Types.SMALLINT, "SMALLINT");
-        typeMap.put(Types.STRUCT, "STRUCT");
-        typeMap.put(Types.TIME, "TIME");
-        typeMap.put(Types.TIMESTAMP, "TIMESTAMP");
-        typeMap.put(Types.TINYINT, "TINYINT");
-        typeMap.put(Types.VARBINARY, "VARBINARY"); //$NON-NLS-1$
-        typeMap.put(Types.VARCHAR, "VARCHAR");
+    	typeMap = new HashMap<Integer, Object[]>();
+        typeMap.put(Types.ARRAY, new Object[]{"ARRAY", new FullyQualifiedJavaType(List.class.getName(), "List<?>", false)});
+        typeMap.put(Types.BIGINT, new Object[]{"BIGINT", new FullyQualifiedJavaType(Long.class.getName(), "Long", false)});
+        typeMap.put(Types.BINARY, new Object[]{"BINARY", new FullyQualifiedJavaType(Byte.class.getName(), "Byte[]", false)});
+        typeMap.put(Types.BIT, new Object[]{"BIT", new FullyQualifiedJavaType(Boolean.class.getName(), "Boolean", false)});
+        typeMap.put(Types.BLOB, new Object[]{"BLOB", new FullyQualifiedJavaType(String.class.getName(), "String", false)});
+        typeMap.put(Types.BOOLEAN, new Object[]{"BOOLEAN", new FullyQualifiedJavaType(Boolean.class.getName(), "Boolean", false)});
+        typeMap.put(Types.CHAR, new Object[]{"CHAR", new FullyQualifiedJavaType(null, "char", true)});
+        typeMap.put(Types.CLOB, new Object[]{"CLOB", new FullyQualifiedJavaType(Byte.class.getName(), "Byte[]", false)});
+        typeMap.put(Types.DATALINK, new Object[]{"DATALINK", new FullyQualifiedJavaType(String.class.getName(), "String", false)});
+        typeMap.put(Types.DATE, new Object[]{"DATE", new FullyQualifiedJavaType(Date.class.getName(), "Date", false) });
+        typeMap.put(Types.DECIMAL, new Object[]{"DECIMAL", new FullyQualifiedJavaType(BigDecimal.class.getName(), "BigDecimal", false) });
+        typeMap.put(Types.DISTINCT, new Object[]{"DISTINCT", new FullyQualifiedJavaType(String.class.getName(), "String", false)});
+        typeMap.put(Types.DOUBLE, new Object[]{"DOUBLE", new FullyQualifiedJavaType(Double.class.getName(), "Double", false)});
+        typeMap.put(Types.FLOAT, new Object[]{"FLOAT", new FullyQualifiedJavaType(Float.class.getName(), "Float", false)});
+        typeMap.put(Types.INTEGER, new Object[]{"INTEGER", new FullyQualifiedJavaType(Integer.class.getName(), "Integer", false)});
+        typeMap.put(Types.JAVA_OBJECT, new Object[]{"JAVA_OBJECT", new FullyQualifiedJavaType(Object.class.getName(), "Object", false)});
+        typeMap.put(Types.LONGNVARCHAR, new Object[]{ "LONGNVARCHAR", new FullyQualifiedJavaType(String.class.getName(), "String", false) });
+        typeMap.put(Types.LONGVARBINARY, new Object[]{ "LONGVARBINARY", new FullyQualifiedJavaType(Byte.class.getName(), "Byte[]", false) });
+        typeMap.put(Types.LONGVARCHAR, new Object[]{ "LONGVARCHAR", new FullyQualifiedJavaType(String.class.getName(), "String", false) });
+        typeMap.put(Types.NCHAR, new Object[]{ "NCHAR", new FullyQualifiedJavaType(String.class.getName(), "String", false) });
+        typeMap.put(Types.NCLOB, new Object[]{ "NCLOB", new FullyQualifiedJavaType(Byte.class.getName(), "Byte[]", false) });
+        typeMap.put(Types.NVARCHAR, new Object[]{"NVARCHAR", new FullyQualifiedJavaType(String.class.getName(), "String", false)});
+        typeMap.put(Types.NULL, new Object[]{ "NULL", new FullyQualifiedJavaType(Object.class.getName(), "Object", false) });
+        typeMap.put(Types.NUMERIC, new Object[]{"NUMERIC", new FullyQualifiedJavaType(Number.class.getName(), "Number", false) });
+        typeMap.put(Types.OTHER, new Object[]{"OTHER", new FullyQualifiedJavaType(Object.class.getName(), "Object", false) });
+        typeMap.put(Types.REAL, new Object[]{"REAL", new FullyQualifiedJavaType(Number.class.getName(), "Number", false) });
+        typeMap.put(Types.REF, new Object[]{"REF", new FullyQualifiedJavaType(Object.class.getName(), "Object", false) });
+        typeMap.put(Types.SMALLINT, new Object[]{"SMALLINT", new FullyQualifiedJavaType(Short.class.getName(), "Short", false) });
+        typeMap.put(Types.STRUCT, new Object[]{"STRUCT", new FullyQualifiedJavaType(Object.class.getName(), "Object", false) });
+        typeMap.put(Types.TIME, new Object[]{"TIME", new FullyQualifiedJavaType(Date.class.getName(), "Date", false) });
+        typeMap.put(Types.TIMESTAMP, new Object[]{"TIMESTAMP", new FullyQualifiedJavaType(Date.class.getName(), "Date", false) });
+        typeMap.put(Types.TINYINT, new Object[]{"TINYINT", new FullyQualifiedJavaType(Short.class.getName(), "Short", false) });
+        typeMap.put(Types.VARBINARY, new Object[]{"VARBINARY", new FullyQualifiedJavaType(Byte.class.getName(), "Byte[]", false) });
+        typeMap.put(Types.VARCHAR, new Object[]{"VARCHAR", new FullyQualifiedJavaType(String.class.getName(), "String", false)});
     }
 }

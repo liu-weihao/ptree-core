@@ -49,7 +49,7 @@ public class DefaultShellCallback implements ShellCallback {
         // if it does not already exist
 
         File project = new File(targetProject);
-        if (!project.isDirectory()) return null;
+        System.out.println(project.getAbsolutePath());
 
         StringBuilder sb = new StringBuilder();
         if(!StringUtils.isBlank(targetPackage)){
@@ -61,7 +61,7 @@ public class DefaultShellCallback implements ShellCallback {
         }
 
         File directory = new File(project, sb.toString());
-        if (!directory.isDirectory()) {
+        if (!directory.exists()) {
             boolean rc = directory.mkdirs();
             if (!rc) return null;
         }

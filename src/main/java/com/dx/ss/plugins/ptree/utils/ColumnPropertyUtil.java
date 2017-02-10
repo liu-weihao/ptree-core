@@ -62,4 +62,14 @@ public class ColumnPropertyUtil {
 		return str;
 	}
 	
+	public static String upperFirstLetter(String str){
+		if(StringUtils.isBlank(str))	return StringUtils.EMPTY;
+		char firstLetter = str.charAt(0);
+		if (firstLetter >= 'a' && firstLetter <= 'z') {
+			String temp = new String(new char[]{firstLetter});
+			return str.replaceFirst(temp, temp.toUpperCase());
+		}
+		return str;
+	}
+	
 }
