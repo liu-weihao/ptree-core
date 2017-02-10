@@ -2,6 +2,8 @@ package com.dx.ss.plugins.ptree.generate.java;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.dx.ss.plugins.ptree.utils.ColumnPropertyUtil;
+
 public class FullyQualifiedJavaType {
 
 	private String packageName;
@@ -13,6 +15,15 @@ public class FullyQualifiedJavaType {
 	private boolean primitive = false;
 	
 	
+	public FullyQualifiedJavaType(String packageName) {
+		super();
+		this.packageName = packageName;
+		if(StringUtils.isNoneBlank(packageName)){
+			String type = packageName.substring(packageName.lastIndexOf(".") + 1);
+			this.simpleName = ColumnPropertyUtil.lowerFirstLetter(type);
+		}
+	}
+
 	public FullyQualifiedJavaType(String packageName, String simpleName, boolean primitive) {
 		super();
 		this.packageName = packageName;

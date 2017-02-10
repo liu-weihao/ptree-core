@@ -15,6 +15,12 @@ public class Parameter {
 		this.type = type;
 	}
 
+	public Parameter(FullyQualifiedJavaType type, String name) {
+		super();
+		this.type = type;
+		this.name = name;
+	}
+
 	public FullyQualifiedJavaType getType() {
 		return type;
 	}
@@ -32,7 +38,7 @@ public class Parameter {
 	}
 
 	public String getFormattedContent() {
-		String content = type.getSimpleName();
+		String content = ColumnPropertyUtil.upperFirstLetter(type.getSimpleName()) ;
 		if(StringUtils.isBlank(name))	name = ColumnPropertyUtil.lowerFirstLetter(content);
 		content += " ";
 		content += name;

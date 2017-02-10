@@ -100,20 +100,20 @@ public class GeneratedJavaFile extends GeneratedFile {
 		content.append(packageName);
 		content.append(";");
 		OutputUtil.newLine(content);
+		OutputUtil.newLine(content);
 		content.append(StringUtils.isBlank(imports)?StringUtils.EMPTY:imports);
 		OutputUtil.newLine(content);
 		content.append(visibility.getValue());
-		content.append(" ");
-		content.append(isInterface ? "interface" : "class");
-		content.append(" ");
+		content.append(isInterface ? "interface " : "class ");
 		content.append(className);
 		content.append(" {");
 		OutputUtil.newLine(content);
 		
 		if(javaAttributes != null){
 			for(JavaAttribute attr : javaAttributes){
+				OutputUtil.newLine(content);
+				OutputUtil.javaIndent(content, 1);
 				content.append(attr.getVisibility().getValue());
-				content.append(" ");
 				content.append(attr.getType().getSimpleName());
 				content.append(" ");
 				content.append(attr.getAttributeName());
@@ -124,14 +124,33 @@ public class GeneratedJavaFile extends GeneratedFile {
 		
 		if(methods != null){
 			for(Method method : methods){
-				content.append(method.getFormattedContent(0, isInterface));
+				OutputUtil.newLine(content);
+				content.append(method.getFormattedContent(1, isInterface));
 				OutputUtil.newLine(content);
 			}
 		}
-		content.append("} ");
+		content.append("}");
 		return content.toString();
 	}
 
+	public void calculateImports(){
+		if(javaAttributes.size() > 0){
+			StringBuilder importBuilder = new StringBuilder();
+			for(JavaAttribute attr:javaAttributes){
+				FullyQualifiedJavaType javaType = attr.getType();
+				String typePackage = javaType.getPackageName();
+				if(javaType != null && StringUtils.isNoneBlank(typePackage) && !typePackage.startsWith("java.lang")){
+					importBuilder.append("import ");
+					importBuilder.append(typePackage);
+					importBuilder.append(";");
+					OutputUtil.newLine(importBuilder);
+				}
+			}
+				
+			setImports(importBuilder.toString());
+		}
+	}
+	
 	@Override
 	public String getFileName() {
 		return this.fileName;

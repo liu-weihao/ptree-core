@@ -161,11 +161,6 @@ public class Mybatis3Generator {
 		PackageConfiguration packageConfig = mybatisConfig.getPackageConfiguration();
 		TableConfiguration table = introspectedTable.getTable();
 		StringBuilder importBuilder = new StringBuilder();
-		importBuilder.append("import ");
-		importBuilder.append(List.class.getName());
-		OutputUtil.newLine(importBuilder);
-		importBuilder.append("import ");
-		importBuilder.append(introspectedTable.getFullQualifiedJavaType());
 		OutputUtil.newLine(importBuilder);
 		String beanPackage = packageConfig.getBasePackage() + "." + packageConfig.getBeanSubPackage();
 		String targetPackage = packageConfig.getBasePackage() + "." +  packageConfig.getBeanSubPackage();
@@ -187,8 +182,8 @@ public class Mybatis3Generator {
 			getterMethod.addBodyLine("return this."+propertyName+";");
 			javaFile.addMethod(getterMethod);
 			Method setterMethod = new Method("set" + ColumnPropertyUtil.upperFirstLetter(propertyName));
-			setterMethod.addParameter(new Parameter(javaProperty));
-			setterMethod.addBodyLine("this."+propertyName+"="+propertyName+";");
+			setterMethod.addParameter(new Parameter(javaProperty, propertyName));
+			setterMethod.addBodyLine("this."+propertyName+" = "+propertyName+";");
 			javaFile.addMethod(setterMethod);
 		}
 		javaFile.setJavaAttributes(javaAttributes);
@@ -204,9 +199,13 @@ public class Mybatis3Generator {
 		importBuilder.append("import ");
 		importBuilder.append(List.class.getName());
 		importBuilder.append(";");
+		OutputUtil.newLine(importBuilder);
+		
 		importBuilder.append("import ");
 		importBuilder.append(introspectedTable.getFullQualifiedJavaType());
 		importBuilder.append(";");
+		OutputUtil.newLine(importBuilder);
+
 		String targetPackage = packageConfig.getModel();
 		GeneratedJavaFile javaFile = new GeneratedJavaFile("src/main/java", targetPackage, introspectedTable.getFileName());
 		javaFile.setPackageName(packageConfig.getModel());
@@ -217,43 +216,43 @@ public class Mybatis3Generator {
 		Method selectChildNodes = new Method("selectChildNodes");
 		selectChildNodes.setVisibility(JavaVisibility.PUBLIC);
 		selectChildNodes.setReturnType(new FullyQualifiedJavaType(List.class.getName(), "List<"+table.getBeanName()+">", false));
-		selectChildNodes.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getFullQualifiedJavaType(), table.getBeanName(), false)));
+		selectChildNodes.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getFullQualifiedJavaType()), ColumnPropertyUtil.lowerFirstLetter(table.getBeanName())));
 		javaFile.addMethod(selectChildNodes);
 		
 		Method getAllParents = new Method("getAllParents");
 		getAllParents.setVisibility(JavaVisibility.PUBLIC);
 		getAllParents.setReturnType(new FullyQualifiedJavaType(List.class.getName(), "List<"+table.getBeanName()+">", false));
-		getAllParents.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getFullQualifiedJavaType(), table.getBeanName(), false)));
+		getAllParents.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getFullQualifiedJavaType()), ColumnPropertyUtil.lowerFirstLetter(table.getBeanName())));
 		javaFile.addMethod(getAllParents);
 		
 		Method getParentClassify = new Method("getParentClassify");
 		getParentClassify.setVisibility(JavaVisibility.PUBLIC);
 		getParentClassify.setReturnType(new FullyQualifiedJavaType(introspectedTable.getFullQualifiedJavaType(), table.getBeanName(), false));
-		getParentClassify.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getFullQualifiedJavaType(), table.getBeanName(), false)));
+		getParentClassify.addParameter(new Parameter(new FullyQualifiedJavaType(introspectedTable.getFullQualifiedJavaType()), ColumnPropertyUtil.lowerFirstLetter(table.getBeanName())));
 		javaFile.addMethod(getParentClassify);
 		
 		Method allocateLeftId = new Method("allocateLeftId");
 		allocateLeftId.setVisibility(JavaVisibility.PUBLIC);
 		allocateLeftId.setReturnType(new FullyQualifiedJavaType(Integer.class.getName(), "int", true));
-		allocateLeftId.addParameter(new Parameter(new FullyQualifiedJavaType(Integer.class.getName(), "leftId", true)));
+		allocateLeftId.addParameter(new Parameter(new FullyQualifiedJavaType(Integer.class.getName()), "leftId"));
 		javaFile.addMethod(allocateLeftId);
 		
-		Method allocateRightId = new Method("allocateLeftId");
+		Method allocateRightId = new Method("allocateRightId");
 		allocateRightId.setVisibility(JavaVisibility.PUBLIC);
 		allocateRightId.setReturnType(new FullyQualifiedJavaType(Integer.class.getName(), "int", true));
-		allocateRightId.addParameter(new Parameter(new FullyQualifiedJavaType(Integer.class.getName(), "rightId", true)));
+		allocateRightId.addParameter(new Parameter(new FullyQualifiedJavaType(Integer.class.getName()), "rightId"));
 		javaFile.addMethod(allocateRightId);
 		
 		Method recycleLeftId = new Method("recycleLeftId");
 		recycleLeftId.setVisibility(JavaVisibility.PUBLIC);
 		recycleLeftId.setReturnType(new FullyQualifiedJavaType(Integer.class.getName(), "int", true));
-		recycleLeftId.addParameter(new Parameter(new FullyQualifiedJavaType(Integer.class.getName(), "leftId", true)));
+		recycleLeftId.addParameter(new Parameter(new FullyQualifiedJavaType(Integer.class.getName()), "leftId"));
 		javaFile.addMethod(recycleLeftId);
 
 		Method recycleRightId = new Method("recycleRightId");
 		recycleRightId.setVisibility(JavaVisibility.PUBLIC);
 		recycleRightId.setReturnType(new FullyQualifiedJavaType(Integer.class.getName(), "int", true));
-		recycleRightId.addParameter(new Parameter(new FullyQualifiedJavaType(Integer.class.getName(), "rightId", true)));
+		recycleRightId.addParameter(new Parameter(new FullyQualifiedJavaType(Integer.class.getName()) , "rightId"));
 		javaFile.addMethod(recycleRightId);
 		
 		return javaFile;
@@ -265,6 +264,7 @@ public class Mybatis3Generator {
 		for(GeneratedJavaFile javaFile:generatedJavaFiles){
 			BufferedWriter bw = null;
 			try {
+				javaFile.calculateImports();
 				String javaSource = javaFile.getFormattedContent();
 				String directory = shellCallback.getDirectory(javaFile.getTargetProject(), javaFile.getTargetPackage()).getAbsolutePath();
 				String filePath =  directory + File.separatorChar + javaFile.getFileName() + ".java";

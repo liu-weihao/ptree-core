@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.dx.ss.plugins.ptree.utils.OutputUtil;
+
 /**
  * The Class XmlElement.
  *
@@ -129,7 +131,7 @@ public class XmlElement extends Element {
     public String getFormattedContent(int indentLevel) {
         StringBuilder sb = new StringBuilder();
 
-        OutputUtilities.xmlIndent(sb, indentLevel);
+        OutputUtil.xmlIndent(sb, indentLevel);
         sb.append('<');
         sb.append(name);
 
@@ -142,11 +144,11 @@ public class XmlElement extends Element {
         if (elements.size() > 0) {
             sb.append(">"); //$NON-NLS-1$
             for (Element element : elements) {
-                OutputUtilities.newLine(sb);
+            	OutputUtil.newLine(sb);
                 sb.append(element.getFormattedContent(indentLevel + 1));
             }
-            OutputUtilities.newLine(sb);
-            OutputUtilities.xmlIndent(sb, indentLevel);
+            OutputUtil.newLine(sb);
+            OutputUtil.xmlIndent(sb, indentLevel);
             sb.append("</"); //$NON-NLS-1$
             sb.append(name);
             sb.append('>');

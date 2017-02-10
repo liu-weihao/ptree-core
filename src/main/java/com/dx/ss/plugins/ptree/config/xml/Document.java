@@ -15,6 +15,8 @@
  */
 package com.dx.ss.plugins.ptree.config.xml;
 
+import com.dx.ss.plugins.ptree.utils.OutputUtil;
+
 /**
  * The Class Document.
  *
@@ -100,7 +102,7 @@ public class Document {
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"); //$NON-NLS-1$
 
         if (publicId != null && systemId != null) {
-            OutputUtilities.newLine(sb);
+        	OutputUtil.newLine(sb);
             sb.append("<!DOCTYPE "); //$NON-NLS-1$
             sb.append(rootElement.getName());
             sb.append(" PUBLIC \""); //$NON-NLS-1$
@@ -110,7 +112,7 @@ public class Document {
             sb.append("\">"); //$NON-NLS-1$
         }
 
-        OutputUtilities.newLine(sb);
+        OutputUtil.newLine(sb);
         sb.append(rootElement.getFormattedContent(0));
 
         return sb.toString();

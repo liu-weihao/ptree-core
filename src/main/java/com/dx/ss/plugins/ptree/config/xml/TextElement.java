@@ -15,6 +15,8 @@
  */
 package com.dx.ss.plugins.ptree.config.xml;
 
+import com.dx.ss.plugins.ptree.utils.OutputUtil;
+
 /**
  * The Class TextElement.
  *
@@ -42,7 +44,7 @@ public class TextElement extends Element {
     @Override
     public String getFormattedContent(int indentLevel) {
         StringBuilder sb = new StringBuilder();
-        OutputUtilities.xmlIndent(sb, indentLevel);
+        OutputUtil.xmlIndent(sb, indentLevel);
         sb.append(content);
         return sb.toString();
     }

@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.dx.ss.plugins.ptree.config.xml.OutputUtilities;
+import com.dx.ss.plugins.ptree.utils.OutputUtil;
 
 public class Method {
 
@@ -51,7 +51,7 @@ public class Method {
      */
     public Method() {
         // use a default name to avoid malformed code
-        this("bar"); //$NON-NLS-1$
+        this("foo"); //$NON-NLS-1$
     }
     
     /**
@@ -130,45 +130,44 @@ public class Method {
      * @return the formatted content
      */
     public String getFormattedContent(int indentLevel, boolean interfaceMethod) {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder methodBuilder = new StringBuilder();
 
-        OutputUtilities.javaIndent(sb, indentLevel);
+        OutputUtil.javaIndent(methodBuilder, indentLevel);
 
         if (interfaceMethod) {
-        	sb.append("public ");
+        	methodBuilder.append("public ");
         } else {
-            sb.append(getVisibility().getValue());
-
+            methodBuilder.append(getVisibility().getValue());
         }
 
         if (getReturnType() == null) {
-            sb.append("void"); //$NON-NLS-1$
+            methodBuilder.append("void"); //$NON-NLS-1$
         } else {
-            sb.append(getReturnType().getSimpleName());
+            methodBuilder.append(getReturnType().getSimpleName());
         }
-        sb.append(' ');
+        methodBuilder.append(' ');
 
-        sb.append(getName());
-        sb.append('(');
+        methodBuilder.append(getName());
+        methodBuilder.append('(');
 
         boolean comma = false;
         for (Parameter parameter : getParameters()) {
             if (comma) {
-                sb.append(", ");
+                methodBuilder.append(", ");
             } else {
                 comma = true;
             }
 
-            sb.append(parameter.getFormattedContent());
+            methodBuilder.append(parameter.getFormattedContent());
         }
 
-        sb.append(')');
+        methodBuilder.append(')');
 
         // if no body lines, then this is an abstract/interface method
         if (bodyLines.size() == 0) {
-            sb.append(';');
+            methodBuilder.append(';');
         } else {
-            sb.append(" {"); //$NON-NLS-1$
+            methodBuilder.append(" {"); //$NON-NLS-1$
             indentLevel++;
 
             ListIterator<String> listIter = bodyLines.listIterator();
@@ -178,9 +177,9 @@ public class Method {
                     indentLevel--;
                 }
 
-                OutputUtilities.newLine(sb);
-                OutputUtilities.javaIndent(sb, indentLevel);
-                sb.append(line);
+                OutputUtil.newLine(methodBuilder);
+                OutputUtil.javaIndent(methodBuilder, indentLevel);
+                methodBuilder.append(line);
 
                 if ((line.endsWith("{") && !line.startsWith("switch")) //$NON-NLS-1$ //$NON-NLS-2$
                         || line.endsWith(":")) { //$NON-NLS-1$
@@ -203,12 +202,12 @@ public class Method {
             }
 
             indentLevel--;
-            OutputUtilities.newLine(sb);
-            OutputUtilities.javaIndent(sb, indentLevel);
-            sb.append('}');
+            OutputUtil.newLine(methodBuilder);
+            OutputUtil.javaIndent(methodBuilder, indentLevel);
+            methodBuilder.append('}');
         }
 
-        return sb.toString();
+        return methodBuilder.toString();
     }
 
     
