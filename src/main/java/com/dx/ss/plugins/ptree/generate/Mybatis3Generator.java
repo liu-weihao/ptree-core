@@ -42,6 +42,7 @@ import com.dx.ss.plugins.ptree.internal.table.IntrospectedColumn;
 import com.dx.ss.plugins.ptree.internal.table.IntrospectedTable;
 import com.dx.ss.plugins.ptree.utils.ClassloaderUtility;
 import com.dx.ss.plugins.ptree.utils.ColumnPropertyUtil;
+import com.dx.ss.plugins.ptree.utils.OutputUtil;
 
 public class Mybatis3Generator {
 
@@ -127,7 +128,8 @@ public class Mybatis3Generator {
 				column.setNullable(nullable);
 				column.setJdbcType(jdbcType);
 				column.setJdbcTypeName(XmlConstants.typeMap.get(jdbcType)[0].toString());
-				column.setJavaProperty((FullyQualifiedJavaType) XmlConstants.typeMap.get(jdbcType)[1]);
+				FullyQualifiedJavaType javaProperty = (FullyQualifiedJavaType) XmlConstants.typeMap.get(jdbcType)[1];
+				column.setJavaProperty(javaProperty);
 				column.setDefaultValue(defaultValue);
 				column.setRemarks(remarks);
 				if(columnName.equals(primaryKey)){//primary key
@@ -161,11 +163,13 @@ public class Mybatis3Generator {
 		StringBuilder importBuilder = new StringBuilder();
 		importBuilder.append("import ");
 		importBuilder.append(List.class.getName());
+		OutputUtil.newLine(importBuilder);
 		importBuilder.append("import ");
 		importBuilder.append(introspectedTable.getFullQualifiedJavaType());
+		OutputUtil.newLine(importBuilder);
 		String beanPackage = packageConfig.getBasePackage() + "." + packageConfig.getBeanSubPackage();
 		String targetPackage = packageConfig.getBasePackage() + "." +  packageConfig.getBeanSubPackage();
-		GeneratedJavaFile javaFile = new GeneratedJavaFile("src/main/java", targetPackage, introspectedTable.getFileName());
+		GeneratedJavaFile javaFile = new GeneratedJavaFile("src/main/java", targetPackage, table.getBeanName());
 		javaFile.setPackageName(beanPackage);
 		javaFile.setInterface(false);
 		javaFile.setClassName(table.getBeanName());
@@ -180,11 +184,12 @@ public class Mybatis3Generator {
 			javaAttributes.add(primaryAttr);
 			Method getterMethod = new Method("get" + ColumnPropertyUtil.upperFirstLetter(propertyName));
 			getterMethod.setReturnType(javaProperty);
-			getterMethod.addParameter(new Parameter(javaProperty));
-			getterMethod.addBodyLine("return this."+propertyName);
+			getterMethod.addBodyLine("return this."+propertyName+";");
 			javaFile.addMethod(getterMethod);
 			Method setterMethod = new Method("set" + ColumnPropertyUtil.upperFirstLetter(propertyName));
-			setterMethod.addBodyLine("this."+propertyName+"="+propertyName);
+			setterMethod.addParameter(new Parameter(javaProperty));
+			setterMethod.addBodyLine("this."+propertyName+"="+propertyName+";");
+			javaFile.addMethod(setterMethod);
 		}
 		javaFile.setJavaAttributes(javaAttributes);
 		return javaFile;
@@ -296,7 +301,7 @@ public class Mybatis3Generator {
 	private XmlElement getSqlMapElement(Mybatis3Configuration mybatisConfig, IntrospectedTable introspectedTable) {
 		TableConfiguration table = introspectedTable.getTable();
 		XmlElement answer = new XmlElement("mapper");
-		answer.addAttribute(new Attribute("namespace", mybatisConfig.getXmlMapper().getModel()+introspectedTable.getFileName()));
+		answer.addAttribute(new Attribute("namespace", mybatisConfig.getXmlMapper().getModel()+"."+introspectedTable.getFileName()));
 		/***************************<resultMap>****************************/
 		XmlElement resultMap = new XmlElement("resultMap");
 		resultMap.addAttribute(new Attribute("id", "BaseResultMap"));

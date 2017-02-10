@@ -96,9 +96,11 @@ public class GeneratedJavaFile extends GeneratedFile {
 	
 	public String getFormattedContent(){
 		StringBuilder content = new StringBuilder();
+		content.append("package ");
 		content.append(packageName);
+		content.append(";");
 		OutputUtil.newLine(content);
-		content.append(imports);
+		content.append(StringUtils.isBlank(imports)?StringUtils.EMPTY:imports);
 		OutputUtil.newLine(content);
 		content.append(visibility.getValue());
 		content.append(" ");
@@ -123,6 +125,7 @@ public class GeneratedJavaFile extends GeneratedFile {
 		if(methods != null){
 			for(Method method : methods){
 				content.append(method.getFormattedContent(0, isInterface));
+				OutputUtil.newLine(content);
 			}
 		}
 		content.append("} ");
