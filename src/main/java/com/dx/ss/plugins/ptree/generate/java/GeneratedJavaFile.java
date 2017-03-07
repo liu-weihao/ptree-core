@@ -1,7 +1,11 @@
 package com.dx.ss.plugins.ptree.generate.java;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -26,6 +30,8 @@ public class GeneratedJavaFile extends GeneratedFile {
 	
 	private String className;
 	
+	private Map<String, FullyQualifiedJavaType> classAnnotions;
+	
 	private List<JavaAttribute> javaAttributes = null;
 	
 	private List<Method> methods = null;
@@ -40,6 +46,7 @@ public class GeneratedJavaFile extends GeneratedFile {
 		this.fileName = fileName;
 		methods = new ArrayList<>();
 		javaAttributes = new ArrayList<>();
+		classAnnotions = new HashMap<>();
 	}
 	
 	public String getPackageName() {
@@ -76,6 +83,14 @@ public class GeneratedJavaFile extends GeneratedFile {
 
 	public void setClassName(String className) {
 		this.className = className;
+	}
+
+	public Map<String, FullyQualifiedJavaType> getClassAnnotions() {
+		return classAnnotions;
+	}
+
+	public void addClassAnnotions(String name, FullyQualifiedJavaType type) {
+		this.classAnnotions.put(name, type);
 	}
 
 	public List<JavaAttribute> getJavaAttributes() {
@@ -119,6 +134,14 @@ public class GeneratedJavaFile extends GeneratedFile {
 		OutputUtil.newLine(content);
 		content.append(StringUtils.isBlank(imports)?StringUtils.EMPTY:imports);
 		OutputUtil.newLine(content);
+		if(classAnnotions.size() > 0){
+			Set<String> keySet = classAnnotions.keySet();
+			for(String name:keySet){
+				content.append("@");
+				content.append(name);
+				OutputUtil.newLine(content);
+			}
+		}
 		content.append(visibility.getValue());
 		content.append(isInterface ? "interface " : "class ");
 		content.append(className);
@@ -161,20 +184,32 @@ public class GeneratedJavaFile extends GeneratedFile {
 	}
 
 	public void calculateImports(){
+		StringBuilder importBuilder = new StringBuilder(this.imports);
 		if(javaAttributes.size() > 0){
-			StringBuilder importBuilder = new StringBuilder(this.imports);
 			for(JavaAttribute attr:javaAttributes){
 				FullyQualifiedJavaType javaType = attr.getType();
 				String typePackage = javaType.getPackageName();
-				if(javaType != null && StringUtils.isNoneBlank(typePackage) && !typePackage.startsWith("java.lang")){
+				if(javaType != null && !javaType.isPrimitive() && StringUtils.isNoneBlank(typePackage) && !typePackage.startsWith("java.lang")){
 					importBuilder.append("import ");
 					importBuilder.append(typePackage);
 					importBuilder.append(";");
 					OutputUtil.newLine(importBuilder);
 				}
 			}
-			this.imports = importBuilder.toString();
 		}
+		if(classAnnotions.size() > 0){
+			Collection<FullyQualifiedJavaType> types = classAnnotions.values();
+			for(FullyQualifiedJavaType type:types){
+				String typePackage = type.getPackageName();
+				if(type != null && !type.isPrimitive() && StringUtils.isNoneBlank(typePackage) && !typePackage.startsWith("java.lang")){
+					importBuilder.append("import ");
+					importBuilder.append(typePackage);
+					importBuilder.append(";");
+					OutputUtil.newLine(importBuilder);
+				}
+			}
+		}
+		this.imports = importBuilder.toString();
 	}
 	
 	public void appendImports(String imports){

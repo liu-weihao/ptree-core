@@ -303,6 +303,8 @@ public class Mybatis3Generator {
 		String simpleName = "ClassifyService<"+table.getBeanName()+", "+table.getBeanName()+"Dao>";
 		FullyQualifiedJavaType superClass = new FullyQualifiedJavaType("com.dx.ss.plugins.ptree.impl", simpleName, false);
 		javaFile.setSuperClass(superClass);
+		javaFile.addClassAnnotions("Service", new FullyQualifiedJavaType("org.springframework.stereotype.Service", "Service", false));
+		javaFile.addClassAnnotions("Transactional", new FullyQualifiedJavaType("javax.transaction.Transactional", "Transactional", false));
 		javaFile.setClassName(fileName);
 		return javaFile;
 	}
@@ -334,6 +336,7 @@ public class Mybatis3Generator {
 		String simpleName = "TreeDao<"+table.getBeanName()+">";
 		FullyQualifiedJavaType superClass = new FullyQualifiedJavaType("com.dx.ss.plugins.ptree.dao", simpleName, false);
 		javaFile.setSuperClass(superClass);
+		javaFile.addClassAnnotions("Repository", new FullyQualifiedJavaType("org.springframework.stereotype.Repository", "Repository", false));
 		javaFile.setClassName(fileName);
 		return javaFile;
 	}

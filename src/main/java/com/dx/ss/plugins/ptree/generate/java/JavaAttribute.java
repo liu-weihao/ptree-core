@@ -9,7 +9,7 @@ public class JavaAttribute {
 	
 	private FullyQualifiedJavaType type;
 	
-	private List<Map<String, FullyQualifiedJavaType>> annotions;
+	private List<Map<String, FullyQualifiedJavaType>> attributeAnnotions;
 	
 	private String attributeName;
 	
@@ -41,13 +41,13 @@ public class JavaAttribute {
 	public void setType(FullyQualifiedJavaType type) {
 		this.type = type;
 	}
-
-	public List<Map<String, FullyQualifiedJavaType>> getAnnotions() {
-		return annotions;
+	 
+	public List<Map<String, FullyQualifiedJavaType>> getAttributeAnnotions() {
+		return attributeAnnotions;
 	}
 
-	public void addAnnotion(Map<String, FullyQualifiedJavaType> annotion) {
-		this.annotions.add(annotion);
+	public void setAttributeAnnotions(List<Map<String, FullyQualifiedJavaType>> attributeAnnotions) {
+		this.attributeAnnotions = attributeAnnotions;
 	}
 
 	public String getAttributeName() {
