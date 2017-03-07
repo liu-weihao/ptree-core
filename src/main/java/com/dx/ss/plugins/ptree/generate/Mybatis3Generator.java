@@ -158,8 +158,8 @@ public class Mybatis3Generator {
 			GeneratedJavaFile daoFile = generateDao(it);
 			generatedJavaFiles.add(daoFile);
 			
-//			GeneratedJavaFile serviceFile = generateService(it);
-//			generatedJavaFiles.add(serviceFile);
+			GeneratedJavaFile serviceFile = generateService(it);
+			generatedJavaFiles.add(serviceFile);
 		}
 	}
 
@@ -178,19 +178,20 @@ public class Mybatis3Generator {
 		javaFile.setPackageName(beanPackage);
 		javaFile.setInterface(false);
 		javaFile.setClassName(table.getBeanName());
-		//必须继承 com.dx.ss.plugins.ptree.model.TreeNode
+		//extends com.dx.ss.plugins.ptree.model.TreeNode
 		FullyQualifiedJavaType superClass = new FullyQualifiedJavaType("com.dx.ss.plugins.ptree.model", "TreeNode", false);
 		javaFile.setSuperClass(superClass);
+		importBuilder.append("import com.dx.ss.plugins.ptree.model.TreeNode;");
+		javaFile.appendImports(importBuilder.toString());
 		List<IntrospectedColumn> allColumns = introspectedTable.getAllColumns();
-		List<JavaAttribute> javaAttributes = new ArrayList<>();
 		for(IntrospectedColumn column:allColumns){
 			String propertyName = ColumnPropertyUtil.getPropertyFromColumn(column.getActualColumnName());
 			if(TreeAttribute.getEnumByAttribute(propertyName) != null)	continue;
 			JavaAttribute javaAttribute = new JavaAttribute();
 			FullyQualifiedJavaType javaProperty = column.getJavaProperty();
 			javaAttribute.setType(javaProperty);
-			javaAttributes.add(javaAttribute);
 			javaAttribute.setAttributeName(propertyName);
+			javaFile.addJavaAttribute(javaAttribute);
 			Method getterMethod = new Method("get" + ColumnPropertyUtil.upperFirstLetter(propertyName));
 			getterMethod.setReturnType(javaProperty);
 			getterMethod.addBodyLine("return this."+propertyName+";");
@@ -203,7 +204,6 @@ public class Mybatis3Generator {
 				javaAttribute.setComments(column.getRemarks());
 			}
 		}
-		javaFile.setJavaAttributes(javaAttributes);
 		return javaFile;
 	}
 
@@ -227,7 +227,7 @@ public class Mybatis3Generator {
 		GeneratedJavaFile javaFile = new GeneratedJavaFile("src/main/java", targetPackage, introspectedTable.getFileName());
 		javaFile.setPackageName(packageConfig.getModel());
 		javaFile.setInterface(true);
-		javaFile.setImports(importBuilder.toString());
+		javaFile.appendImports(importBuilder.toString());
 		javaFile.setVisibility(JavaVisibility.PUBLIC);
 		javaFile.setClassName(introspectedTable.getFileName());
 		Method selectChildNodes = new Method("selectChildNodes");
@@ -282,27 +282,60 @@ public class Mybatis3Generator {
 		PackageConfiguration packageConfig = mybatisConfig.getPackageConfiguration();
 		TableConfiguration table = introspectedTable.getTable();
 		StringBuilder importBuilder = new StringBuilder();
+		
 		importBuilder.append("import ");
-		importBuilder.append(List.class.getName());
+		importBuilder.append(packageConfig.getBasePackage() + "." + packageConfig.getDaoSubPackage() + "." + table.getBeanName() + "Dao");
 		importBuilder.append(";");
 		OutputUtil.newLine(importBuilder);
 		
 		importBuilder.append("import ");
-		importBuilder.append(introspectedTable.getFullQualifiedJavaType());
+		importBuilder.append(packageConfig.getBasePackage() + "." + packageConfig.getBeanSubPackage() + "." + table.getBeanName());
 		importBuilder.append(";");
 		OutputUtil.newLine(importBuilder);
+		
+		importBuilder.append("import com.dx.ss.plugins.ptree.impl.ClassifyService;");
 
+		String fileName = table.getBeanName() + "Service";
 		String targetPackage = packageConfig.getBasePackage() + "." + packageConfig.getServiceSubPackage();
-		GeneratedJavaFile javaFile = new GeneratedJavaFile("src/main/java", targetPackage, introspectedTable.getFileName());
+		GeneratedJavaFile javaFile = new GeneratedJavaFile("src/main/java", targetPackage, fileName);
+		javaFile.appendImports(importBuilder.toString());
 		javaFile.setPackageName(targetPackage);
-		
+		String simpleName = "ClassifyService<"+table.getBeanName()+", "+table.getBeanName()+"Dao>";
+		FullyQualifiedJavaType superClass = new FullyQualifiedJavaType("com.dx.ss.plugins.ptree.impl", simpleName, false);
+		javaFile.setSuperClass(superClass);
+		javaFile.setClassName(fileName);
 		return javaFile;
 	}
 	
 
 	private GeneratedJavaFile generateDao(IntrospectedTable introspectedTable) {
 		// TODO Auto-generated method stub
-		return null;
+		Mybatis3Configuration mybatisConfig = (Mybatis3Configuration) configuration;
+		PackageConfiguration packageConfig = mybatisConfig.getPackageConfiguration();
+		TableConfiguration table = introspectedTable.getTable();
+		StringBuilder importBuilder = new StringBuilder();
+		importBuilder.append("import ");
+		importBuilder.append(List.class.getName());
+		importBuilder.append(";");
+		OutputUtil.newLine(importBuilder);
+		
+		importBuilder.append("import ");
+		importBuilder.append(packageConfig.getBasePackage() + "." + packageConfig.getBeanSubPackage() + "." + table.getBeanName());
+		importBuilder.append(";");
+		OutputUtil.newLine(importBuilder);
+
+		importBuilder.append("import com.dx.ss.plugins.ptree.dao.TreeDao;");
+		
+		String fileName = table.getBeanName() + "Dao";
+		String targetPackage = packageConfig.getBasePackage() + "." + packageConfig.getDaoSubPackage();
+		GeneratedJavaFile javaFile = new GeneratedJavaFile("src/main/java", targetPackage, fileName);
+		javaFile.appendImports(importBuilder.toString());
+		javaFile.setPackageName(targetPackage);
+		String simpleName = "TreeDao<"+table.getBeanName()+">";
+		FullyQualifiedJavaType superClass = new FullyQualifiedJavaType("com.dx.ss.plugins.ptree.dao", simpleName, false);
+		javaFile.setSuperClass(superClass);
+		javaFile.setClassName(fileName);
+		return javaFile;
 	}
 	
 	private void writeJavaFiles() {

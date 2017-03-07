@@ -18,7 +18,7 @@ public class GeneratedJavaFile extends GeneratedFile {
     
 	private String packageName;
 	
-	private String imports;
+	private String imports = "";
 	
 	private JavaVisibility visibility = JavaVisibility.PUBLIC;
 	
@@ -54,10 +54,6 @@ public class GeneratedJavaFile extends GeneratedFile {
 		return imports;
 	}
 
-	public void setImports(String imports) {
-		this.imports = imports;
-	}
-
 	public JavaVisibility getVisibility() {
 		return visibility;
 	}
@@ -86,8 +82,8 @@ public class GeneratedJavaFile extends GeneratedFile {
 		return javaAttributes;
 	}
 
-	public void setJavaAttributes(List<JavaAttribute> javaAttributes) {
-		this.javaAttributes = javaAttributes;
+	public void addJavaAttribute(JavaAttribute javaAttribute) {
+		this.javaAttributes.add(javaAttribute);
 	}
 
 	public List<Method> getMethods() {
@@ -166,7 +162,7 @@ public class GeneratedJavaFile extends GeneratedFile {
 
 	public void calculateImports(){
 		if(javaAttributes.size() > 0){
-			StringBuilder importBuilder = new StringBuilder();
+			StringBuilder importBuilder = new StringBuilder(this.imports);
 			for(JavaAttribute attr:javaAttributes){
 				FullyQualifiedJavaType javaType = attr.getType();
 				String typePackage = javaType.getPackageName();
@@ -177,14 +173,15 @@ public class GeneratedJavaFile extends GeneratedFile {
 					OutputUtil.newLine(importBuilder);
 				}
 			}
-			if(superClass != null){
-				importBuilder.append("import ");
-				importBuilder.append(superClass.getPackageName() + "." + superClass.getSimpleName());
-				importBuilder.append(";");
-				OutputUtil.newLine(importBuilder);
-			}
-			setImports(importBuilder.toString());
+			this.imports = importBuilder.toString();
 		}
+	}
+	
+	public void appendImports(String imports){
+		StringBuilder importBuilder = new StringBuilder(this.imports);
+		importBuilder.append(imports);
+		OutputUtil.newLine(importBuilder);
+		this.imports = importBuilder.toString();
 	}
 	
 	@Override
