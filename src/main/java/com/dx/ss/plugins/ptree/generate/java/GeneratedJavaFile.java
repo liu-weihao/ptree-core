@@ -163,7 +163,6 @@ public class GeneratedJavaFile extends GeneratedFile {
 					OutputUtil.newLine(importBuilder);
 				}
 			}
-				
 			setImports(importBuilder.toString());
 		}
 	}

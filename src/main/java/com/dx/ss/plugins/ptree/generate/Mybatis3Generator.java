@@ -150,10 +150,13 @@ public class Mybatis3Generator {
 		for(IntrospectedTable it:introspectTables){
 			GeneratedJavaFile mapperFile = generateMapper(it);
 			generatedJavaFiles.add(mapperFile);
+			
 			GeneratedJavaFile beanFile = generateBean(it);
 			generatedJavaFiles.add(beanFile);
+			
 			GeneratedJavaFile daoFile = generateDao(it);
 			generatedJavaFiles.add(daoFile);
+			
 			GeneratedJavaFile serviceFile = generateService(it);
 			generatedJavaFiles.add(serviceFile);
 		}
@@ -303,14 +306,16 @@ public class Mybatis3Generator {
 		for(GeneratedJavaFile javaFile:generatedJavaFiles){
 			BufferedWriter bw = null;
 			try {
-				javaFile.calculateImports();
-				String javaSource = javaFile.getFormattedContent();
-				String directory = shellCallback.getDirectory(javaFile.getTargetProject(), javaFile.getTargetPackage()).getAbsolutePath();
-				String filePath =  directory + File.separatorChar + javaFile.getFileName() + ".java";
-				FileOutputStream fos = new FileOutputStream(new File(filePath), false);
-				OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
-				bw = new BufferedWriter(osw);
-				bw.write(javaSource);
+				if(javaFile != null){
+					javaFile.calculateImports();
+					String javaSource = javaFile.getFormattedContent();
+					String directory = shellCallback.getDirectory(javaFile.getTargetProject(), javaFile.getTargetPackage()).getAbsolutePath();
+					String filePath =  directory + File.separatorChar + javaFile.getFileName() + ".java";
+					FileOutputStream fos = new FileOutputStream(new File(filePath), false);
+					OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8");
+					bw = new BufferedWriter(osw);
+					bw.write(javaSource);
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}finally{
