@@ -34,6 +34,7 @@ import com.dx.ss.plugins.ptree.generate.java.JavaAttribute;
 import com.dx.ss.plugins.ptree.generate.java.JavaVisibility;
 import com.dx.ss.plugins.ptree.generate.java.Method;
 import com.dx.ss.plugins.ptree.generate.java.Parameter;
+import com.dx.ss.plugins.ptree.generate.java.TreeAttribute;
 import com.dx.ss.plugins.ptree.generate.xml.GeneratedXmlFile;
 import com.dx.ss.plugins.ptree.impl.DefaultShellCallback;
 import com.dx.ss.plugins.ptree.internal.ObjectFactory;
@@ -157,8 +158,8 @@ public class Mybatis3Generator {
 			GeneratedJavaFile daoFile = generateDao(it);
 			generatedJavaFiles.add(daoFile);
 			
-			GeneratedJavaFile serviceFile = generateService(it);
-			generatedJavaFiles.add(serviceFile);
+//			GeneratedJavaFile serviceFile = generateService(it);
+//			generatedJavaFiles.add(serviceFile);
 		}
 	}
 
@@ -177,15 +178,19 @@ public class Mybatis3Generator {
 		javaFile.setPackageName(beanPackage);
 		javaFile.setInterface(false);
 		javaFile.setClassName(table.getBeanName());
+		//必须继承 com.dx.ss.plugins.ptree.model.TreeNode
+		FullyQualifiedJavaType superClass = new FullyQualifiedJavaType("com.dx.ss.plugins.ptree.model", "TreeNode", false);
+		javaFile.setSuperClass(superClass);
 		List<IntrospectedColumn> allColumns = introspectedTable.getAllColumns();
 		List<JavaAttribute> javaAttributes = new ArrayList<>();
 		for(IntrospectedColumn column:allColumns){
+			String propertyName = ColumnPropertyUtil.getPropertyFromColumn(column.getActualColumnName());
+			if(TreeAttribute.getEnumByAttribute(propertyName) != null)	continue;
 			JavaAttribute javaAttribute = new JavaAttribute();
 			FullyQualifiedJavaType javaProperty = column.getJavaProperty();
 			javaAttribute.setType(javaProperty);
-			String propertyName = ColumnPropertyUtil.getPropertyFromColumn(column.getActualColumnName());
-			javaAttribute.setAttributeName(propertyName);
 			javaAttributes.add(javaAttribute);
+			javaAttribute.setAttributeName(propertyName);
 			Method getterMethod = new Method("get" + ColumnPropertyUtil.upperFirstLetter(propertyName));
 			getterMethod.setReturnType(javaProperty);
 			getterMethod.addBodyLine("return this."+propertyName+";");

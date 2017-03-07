@@ -30,6 +30,8 @@ public class GeneratedJavaFile extends GeneratedFile {
 	
 	private List<Method> methods = null;
 	
+	private FullyQualifiedJavaType superClass;
+	
 	private boolean needComments;
 
 	public GeneratedJavaFile(String targetProject, String targetPackage, String fileName) {
@@ -96,6 +98,14 @@ public class GeneratedJavaFile extends GeneratedFile {
 		if(method != null)		this.methods.add(method);
 	}
 	
+	public FullyQualifiedJavaType getSuperClass() {
+		return superClass;
+	}
+
+	public void setSuperClass(FullyQualifiedJavaType superClass) {
+		this.superClass = superClass;
+	}
+
 	public boolean isNeedComments() {
 		return needComments;
 	}
@@ -116,6 +126,10 @@ public class GeneratedJavaFile extends GeneratedFile {
 		content.append(visibility.getValue());
 		content.append(isInterface ? "interface " : "class ");
 		content.append(className);
+		if(superClass != null){
+			content.append(" extends ");
+			content.append(superClass.getSimpleName());
+		}
 		content.append(" {");
 		OutputUtil.newLine(content);
 		
@@ -162,6 +176,12 @@ public class GeneratedJavaFile extends GeneratedFile {
 					importBuilder.append(";");
 					OutputUtil.newLine(importBuilder);
 				}
+			}
+			if(superClass != null){
+				importBuilder.append("import ");
+				importBuilder.append(superClass.getPackageName() + "." + superClass.getSimpleName());
+				importBuilder.append(";");
+				OutputUtil.newLine(importBuilder);
 			}
 			setImports(importBuilder.toString());
 		}
